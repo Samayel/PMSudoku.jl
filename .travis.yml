@@ -4,11 +4,19 @@ os:
   - linux
   - osx
 julia:
-  - release
-  - nightly
+  - 0.4
+# - nightly
 notifications:
-  email: false
+  email:
+    recipients:
+      - johm@quyo.de
+    on_success: always
+    on_failure: always
 # uncomment the following lines to override the default test script
-#script:
-#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia -e 'Pkg.clone(pwd()); Pkg.build("PMSudoku"); Pkg.test("PMSudoku"; coverage=true)'
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("PMSudoku"); Pkg.test("PMSudoku"; coverage=true)'
+after_success:
+  - julia -e 'Pkg.add("Coverage")'
+  - julia -e 'cd(Pkg.dir("PMSudoku")); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+  - julia -e 'cd(Pkg.dir("PMSudoku")); using Coverage; Codecov.submit(Codecov.process_folder())'
